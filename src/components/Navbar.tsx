@@ -1,22 +1,58 @@
+"use client";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
 export default function Navbar() {
+  const [user, setUser] = useState<{ name: string } | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    setUser(null);
+    router.push("/login");
+    router.refresh();
+  };
+
   return (
-    <div className="navbar bg-base-100/80 backdrop-blur-md sticky top-0 z-50 px-8 border-b border-base-200">
-      <div className="flex-1">
-        <a className="text-2xl font-black tracking-tighter text-primary">SyncUp.</a>
-      </div>
-      <div className="flex-none gap-4">
-        {/* User Profile / Login Button */}
-        <div className="dropdown dropdown-end">
-          <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar online">
-            <div className="w-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-              <img alt="User" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Juma" />
-            </div>
+    <div className="bg-slate-950 border-b border-slate-800">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+        <Link href="/" className="flex items-center gap-3 text-white">
+          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-fuchsia-500 text-lg font-black shadow-lg shadow-indigo-500/20">
+            S
+          </span>
+          <div>
+            <p className="text-xl font-black">SyncUp</p>
+            <p className="text-xs uppercase tracking-[0.32em] text-slate-400">Task manager</p>
           </div>
-          <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow-xl menu menu-sm dropdown-content bg-base-100 rounded-box w-52 border border-base-200">
-            <li><a className="font-bold">Profile</a></li>
-            <li><a>Settings</a></li>
-            <li><a className="text-error font-bold">Logout</a></li>
-          </ul>
+        </Link>
+
+        <nav className="hidden items-center gap-8 text-sm font-medium text-slate-200 md:flex">
+          <Link href="/" className="transition hover:text-white">Home</Link>
+          <Link href="/tasks" className="transition hover:text-white">Tasks</Link>
+          <Link href="/login" className="transition hover:text-white">Login</Link>
+          <Link href="/register" className="transition hover:text-white">Sign Up</Link>
+          <Link href="/profile" className="transition hover:text-white">Profile</Link>
+          <Link href="#features" className="transition hover:text-white">Features</Link>
+          <Link href="#contact" className="transition hover:text-white">Contact</Link>
+        </nav>
+
+        <div className="flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-4 border-l border-slate-800 pl-4 text-slate-300">
+            <Link href="/register" className="rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500">
+              Start free trial
+            </Link>
+            <Link href="/tasks" className="rounded-full border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:bg-slate-800">
+              Open app
+            </Link>
+          </div>
         </div>
       </div>
     </div>

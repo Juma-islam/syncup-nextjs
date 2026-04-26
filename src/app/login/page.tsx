@@ -1,32 +1,91 @@
-export default function LoginPage() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">
-      <div className="card w-96 bg-base-100 shadow-2xl backdrop-blur-md bg-opacity-90 border border-white/20">
-        <div className="card-body items-center text-center">
-          <div className="w-20 h-20 bg-primary text-white rounded-2xl flex items-center justify-center text-3xl font-bold mb-4 shadow-lg">
-            S
-          </div>
-          <h2 className="card-title text-3xl font-extrabold text-slate-800">Welcome Back!</h2>
-          <p className="text-slate-500 mb-6 font-medium">SyncUp: Your Personal Task Hub</p>
-          
-          <div className="form-control w-full gap-4">
-             {/* Google Login Button */}
-            <button className="btn btn-outline gap-3 hover:bg-slate-100 transition-all border-2">
-              <img src="https://authjs.dev/img/providers/google.svg" width="20" alt="Google" />
-              Continue with Google
-            </button>
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
-            {/* GitHub Login Button */}
-            <button className="btn btn-neutral gap-3 shadow-lg">
-              <img src="https://authjs.dev/img/providers/github.svg" width="20" className="invert" alt="GitHub" />
-              Continue with GitHub
-            </button>
+// অবশ্যই 'export default' ব্যবহার করতে হবে
+export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        // ইউজারের ডেটা ব্রাউজারে সেভ করা
+        localStorage.setItem("user", JSON.stringify(data.user));
+        
+        alert(`স্বাগতম, ${data.user.name}!`);
+        router.push("/"); // হোম পেজে নিয়ে যাবে
+        router.refresh(); // Navbar আপডেট করার জন্য
+      } else {
+        alert(data.error || "লগইন ব্যর্থ হয়েছে");
+      }
+    } catch (error) {
+      console.error("Login Error:", error);
+      alert("সার্ভারের সাথে যোগাযোগ করা যাচ্ছে না");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex justify-center items-center min-h-[80vh] bg-base-200 px-4">
+      <div className="card w-full max-w-md bg-base-100 shadow-2xl border border-base-300">
+        <form onSubmit={handleLogin} className="card-body gap-4">
+          <div className="text-center mb-4">
+            <h2 className="text-3xl font-black text-primary">Login to SyncUp</h2>
+            <p className="text-slate-500 text-sm">Welcome back! Please enter your details.</p>
           </div>
-          
-          <div className="mt-8 text-xs text-slate-400">
-            By signing in, you agree to our Terms of Service.
+
+          <div className="form-control">
+            <label className="label font-bold text-xs uppercase text-slate-500">Email Address</label>
+            <input 
+              type="email" 
+              className="input input-bordered focus:input-primary"
+              placeholder="example@mail.com"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)} 
+            />
           </div>
-        </div>
+
+          <div className="form-control">
+            <label className="label font-bold text-xs uppercase text-slate-500">Password</label>
+            <input 
+              type="password" 
+              className="input input-bordered focus:input-primary"
+              placeholder="••••••••"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)} 
+            />
+          </div>
+
+          <button 
+            type="submit" 
+            className={`btn btn-primary w-full mt-4 ${loading ? 'loading' : ''}`}
+            disabled={loading}
+          >
+            {loading ? 'Logging in...' : 'Sign In'}
+          </button>
+
+          <p className="text-center text-sm mt-2">
+            Don't have an account? <Link href="/register" className="link link-primary font-bold">Create Account</Link>
+          </p>
+        </form>
       </div>
     </div>
   );

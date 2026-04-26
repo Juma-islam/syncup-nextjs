@@ -17,18 +17,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-theme="light">
-      <body className={inter.className}>
+    <html lang="en" data-theme="dark">
+      <body className={`${inter.className} bg-slate-950 text-slate-100`}>
         <div className="flex flex-col min-h-screen">
-          {/* Navbar সবার উপরে থাকবে */}
           <Navbar />
-          
-          {/* পেজের কন্টেন্ট মাঝখানে থাকবে */}
           <main className="flex-grow">
             {children}
           </main>
-          
-          {/* Footer সবার নিচে থাকবে */}
           <Footer />
         </div>
       </body>
